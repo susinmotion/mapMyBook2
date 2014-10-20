@@ -30,7 +30,7 @@
           '</div>'+
           '<h1 id="firstHeading" class="firstHeading">{{library.name}}</h1>'+
           '<p>{{library.address}}</p>'+'<p>{{library.number}}</p>';
-          {% if includeCheckedOut%}
+          {% if includeCheckedOut == 'yes'%}
           contentString= contentString+'<p>{{library.status}}</p>'
           {% endif %}
 
