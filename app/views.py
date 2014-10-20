@@ -18,7 +18,7 @@ def index():
 		return render_template ("start.html")
 
 @app.route('/input', methods=['GET'])
-def input(title="", author="",number=None):
+def input(title=None, author=None):
 	title=request.args.get('title')
 	author=request.args.get("author")
 	if request.args.get("includeCheckedOut"):
@@ -51,7 +51,7 @@ def map(title):
 	
 	libraries=[]
 	includeCheckedOut = request.form.get("includeCheckedOut")
-	if includeCheckedOut:
+	if includeCheckedOut != False:
 		copies= thebook.copies
 	else:
 		copies=thebook.available_copies
