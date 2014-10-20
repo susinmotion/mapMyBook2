@@ -1,0 +1,7 @@
+--index-url https://pypi.python.org/simple/
+
+NYPL >=1.0.0
+requests>1.2.0
+beautifulsoup4>=4.0.0
+googlemaps >=1.0.1
+Flask==0.9
