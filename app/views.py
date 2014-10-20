@@ -21,10 +21,7 @@ def index():
 def input(title=None, author=None):
 	title=request.args.get('title')
 	author=request.args.get("author")
-	if request.args.get("includeCheckedOut"):
-		includeCheckedOut = True
-	else:
-		includeCheckedOut = False
+	includeCheckedOut=request.args.get("includeCheckedOut")
 	books=search(title=title, author=author)
 	returnbooks=[]
 	for book in books[0:min(5, len(books))]:
@@ -37,7 +34,6 @@ def input(title=None, author=None):
 @app.route('/map')
 def map(title):
 	bookAsDict=(json.loads(str(request.form.get("value"))))
-	print bookAsDict
 	title = bookAsDict['title']
 	link_to_copies = bookAsDict['link_to_copies']
 	try:
@@ -51,7 +47,8 @@ def map(title):
 	
 	libraries=[]
 	includeCheckedOut = request.form.get("includeCheckedOut")
-	if includeCheckedOut != False:
+	print includeCheckedOut
+	if includeCheckedOut:
 		copies= thebook.copies
 	else:
 		copies=thebook.available_copies
