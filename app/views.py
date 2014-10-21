@@ -22,11 +22,7 @@ def input(title=None, author=None):
 	title=request.args.get('title')
 	author=request.args.get("author")
 	includeCheckedOut=request.args.get("includeCheckedOut")
-	books=search(title=title, author=author)
-	returnbooks=[]
-	for book in books[0:min(5, len(books))]:
-		if book.link_to_copies:
-			returnbooks.append(book)
+	books=findbooks(title=title, author=author)
 	return render_template("pickabook.html",books=returnbooks, jsonBooks=[json.dumps(book.__dict__) for book in returnbooks], includeCheckedOut = includeCheckedOut)
 
 
@@ -79,6 +75,14 @@ def checkedOut(title):
 def noBooks(title):
 	return render_template("nobooks.html", title=title)
 
+@cache.memoize(timeout=None)
+def findbooks(title=None, author=None):
+	books=search(title=title, author=author)
+	returnbooks=[]
+	for book in books[0:min(5, len(books))]:
+		if book.link_to_copies:
+			returnbooks.append(book)
+	return returnbooks
 
 
 #these include the data itself that could be part of the view. The html page controls how it looks and what gets shown
