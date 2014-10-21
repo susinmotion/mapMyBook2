@@ -8,7 +8,7 @@ from libraries import Library
 import cPickle as pickle
 import re
 import json
-
+cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
 @app.route('/', methods=['GET','POST'])
 
