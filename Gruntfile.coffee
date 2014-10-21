@@ -8,7 +8,7 @@ module.exports = (grunt) ->
       pythonServer:
         options:
           stdout: true
-        command: 'python run.py'
+        command: 'python run.py &'
           
     # SASS -> CSS
     compass:

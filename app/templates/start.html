@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Map My Book</title>
+    {% assets "css_all" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
 </head>
-<body>
-<div class="content">
+<body class="sans-serif">
+<div class="container">
     <h1>Map My Book</h1>
     <p>Please input a title, author, or both</p>
     <form name="input" action="{{url_for('input', title=title, author=author)}}" method="GET">
