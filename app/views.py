@@ -8,6 +8,7 @@ from libraries import Library
 import cPickle as pickle
 import re
 import json
+from flask.ext.cache import Cache
 cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
 @app.route('/', methods=['GET','POST'])
@@ -23,7 +24,7 @@ def input(title=None, author=None):
 	author=request.args.get("author")
 	includeCheckedOut=request.args.get("includeCheckedOut")
 	books=findbooks(title=title, author=author)
-	return render_template("pickabook.html",books=returnbooks, jsonBooks=[json.dumps(book.__dict__) for book in returnbooks], includeCheckedOut = includeCheckedOut)
+	return render_template("pickabook.html",books=books, jsonBooks=[json.dumps(book.__dict__) for book in books], includeCheckedOut = includeCheckedOut)
 
 
 @app.route('/map/<title>', methods=['GET','POST'])
