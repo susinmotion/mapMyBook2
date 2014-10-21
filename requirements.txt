@@ -6,3 +6,4 @@ beautifulsoup4>=4.0.0
 googlemaps >=1.0.1
 Flask==0.9
 gunicorn>=19.1.1
+Flask-Cache>=.1
