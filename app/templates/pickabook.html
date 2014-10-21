@@ -1,0 +1,16 @@
+<html>
+<head>
+Pick a book, any book <br>
+</head>
+<body>
+{% for book in books %}
+<form name="{{books.index(book)}}" action="{{url_for('map', title=books[books.index(book)].title)}}" method="POST">
+<button type="submit" name="value" value="{{books.index(book)}}">{{book.title}}
+</button>
+<input type="hidden" name="includeCheckedOut" value="{{includeCheckedOut}}">
+<input type="hidden" name="key" value="{{key}}">
+</form> 
+
+    {% endfor %}
+</body>
+</html>

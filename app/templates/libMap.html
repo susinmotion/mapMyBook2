@@ -1,0 +1,68 @@
+<html>
+  <head> 
+    <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;} #xyz {position: absolute; top: 60px; left:70; background: whitesmoke; border: 5px black double; font-size: 15px; padding: 10px;}
+    </style>
+    <script type="text/javascript"
+      src="{{url}}">
+    </script>
+    <script type="text/javascript">
+        function initialize() {
+          var mapOptions = {
+            center: { lat:40.752198399999997, lng:-73.981831200000002},
+            zoom: 12
+           };
+          var map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+
+          var msgContainer = document.createElement('div');
+          msgContainer.id = 'xyz';             // No setAttribute required
+
+          msgContainer.appendChild(document.createTextNode("showing results for  {{title | safe}}"));
+          var markers = [];
+          document.body.appendChild(msgContainer);
+          var myinfoWindow = new google.maps.InfoWindow({
+            });
+          {% for library in libraries %}
+
+          var contentString = '<div id="content">'+
+          '<div id="siteNotice">'+
+          '</div>'+
+          '<h1 id="firstHeading" class="firstHeading">{{library.name}}</h1>'+
+          '<p>{{library.address}}</p>'+'<p>{{library.number}}</p>';
+          {% if includeCheckedOut == 'yes'%}
+          contentString= contentString+'<p>{{library.status}}</p>'
+          {% endif %}
+
+
+          contentString=contentString +'</div>'+
+          '</div>'
+         
+          var marker= new google.maps.Marker({
+          	position: {lat: {{library.latLng[0]}}, lng: {{library.latLng[1]}} },
+          	map: map,
+          	title: "{{library.location}}",
+            infoWindow : myinfoWindow
+          });
+          markers.push(marker);
+          listen(marker, myinfoWindow, map,contentString)
+        {% endfor %}
+              msgContainer.addEventListener('click', function(event) {console.log(markers);});
+        }
+          
+        function listen(marker, infoWindow,map,contentString){
+          google.maps.event.addListener(marker,'click',function(){
+            infoWindow.setContent(contentString)
+            infoWindow.open(map,marker);
+          });
+        }
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+  <body>
+<div id="map-canvas"></div>
+4
+  </body>
+  5
+</html>

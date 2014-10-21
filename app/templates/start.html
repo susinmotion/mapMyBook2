@@ -1,0 +1,12 @@
+<html>
+<body>
+	Please input a title, author, or both
+<form name="input" action="{{url_for('input', title=title, author=author)}}" method="GET">
+Title: <input type="text" name="title">
+Author: <input type="text" name="author"> 
+<br>
+<input type="checkbox" name="includeCheckedOut" value="yes">Include checked out copies<br>
+<input type="submit" value="Show me the books!">
+</form> 
+</body>
+</html>
