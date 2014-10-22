@@ -3,32 +3,39 @@
 html
     background: url(../nypl.jpg) no-repeat center center fixed
     background-size: cover
+    height: 100%
     
 .container
-    &.home
-        background-color: rgba(0, 0, 0, 0.65)
-        border-radius: 5px
-        color: white
-        width: 50%
+    background-color: rgba(0, 0, 0, 0.65)
+    border-radius: 5px
+    color: white
+    width: 50%
+    position: absolute
+    top: 20%
+    left: 25%
 
-        .content
-            text-align: center
+    .content
+        text-align: center
 
 
-        h1
-            margin-top: 0px
+    h1
+        margin-top: 0px
 
-        input
-            width: 75%
-            margin: 10px
-            font-family: Cardo, serif
+    input
+        width: 75%
+        margin: 10px
+        font-family: Cardo, serif
 
-        input[type='checkbox']
-            width: 10px
+    input[type='checkbox']
+        width: 10px
 
-        label
-            display: block
+    label
+        display: block
 
-        input[type='submit']
-            width: 25%
-            font-size: 14px
+    input[type='submit']
+        width: 25%
+        font-size: 14px
+
+    .query
+        font-style: italic
+        color: rgba(255, 255, 255, 0.8)

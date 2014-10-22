@@ -256,39 +256,48 @@ a:hover {
 html {
   background: url(../nypl.jpg) no-repeat center center fixed;
   background-size: cover;
+  height: 100%;
 }
 
 /* line 8, ../../sass/style.sass */
-.container.home {
+.container {
   background-color: rgba(0, 0, 0, 0.65);
   border-radius: 5px;
   color: white;
   width: 50%;
+  position: absolute;
+  top: 20%;
+  left: 25%;
 }
-/* line 14, ../../sass/style.sass */
-.container.home .content {
+/* line 17, ../../sass/style.sass */
+.container .content {
   text-align: center;
 }
-/* line 18, ../../sass/style.sass */
-.container.home h1 {
+/* line 21, ../../sass/style.sass */
+.container h1 {
   margin-top: 0px;
 }
-/* line 21, ../../sass/style.sass */
-.container.home input {
+/* line 24, ../../sass/style.sass */
+.container input {
   width: 75%;
   margin: 10px;
   font-family: Cardo, serif;
 }
-/* line 26, ../../sass/style.sass */
-.container.home input[type='checkbox'] {
+/* line 29, ../../sass/style.sass */
+.container input[type='checkbox'] {
   width: 10px;
 }
-/* line 29, ../../sass/style.sass */
-.container.home label {
+/* line 32, ../../sass/style.sass */
+.container label {
   display: block;
 }
-/* line 32, ../../sass/style.sass */
-.container.home input[type='submit'] {
+/* line 35, ../../sass/style.sass */
+.container input[type='submit'] {
   width: 25%;
   font-size: 14px;
+}
+/* line 39, ../../sass/style.sass */
+.container .query {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.8);
 }

@@ -1,27 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Map My Book</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="serif">
-<div class="container home">
-    <div class="row">
-        <div class="col-6 content">
-            <h1>Map My Book</h1>
-            <p>Please input a title, author, or both</p>
-            <form name="input" action="{{url_for('input', title=title, author=author)}}" method="GET">
-            <input type="text" name="title" placeholder="Title">
-            <input type="text" name="author" placeholder="Author"> 
-            <br>
-            <label>
-                <input type="checkbox" name="includeCheckedOut" value="yes">Include checked out copies
-            </label>
-            <input type="submit" value="Show me the books!" class='green-btn'>
-            </form>
-        </div>
-    </div>
-</div>
-</body>
-</html>
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Map My Book</h1>
+<p>Please input a title, author, or both</p>
+<form name="input" action="{{url_for('input', title=title, author=author)}}" method="GET">
+    <input type="text" name="title" placeholder="Title" autocomplete="off">
+    <input type="text" name="author" placeholder="Author" autocomplete="off"> 
+    <br>
+    <label>
+        <input type="checkbox" name="includeCheckedOut" value="yes">Include checked out copies
+    </label>
+    <input type="submit" value="Show me the books!" class='blue-btn'>
+</form>
+{% endblock %}
