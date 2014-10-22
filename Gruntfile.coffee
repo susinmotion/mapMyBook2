@@ -14,7 +14,7 @@ module.exports = (grunt) ->
     compass:
       options:
         sassDir: "app/sass"
-        cssDir: "app/css"
+        cssDir: "app/static/css"
         raw: 'preferred_syntax = :sass\n'
       debugsass: true
     
@@ -25,7 +25,7 @@ module.exports = (grunt) ->
         options:
           livereload: true
       style:
-        files: ["src/**/*.sass", "src/**/*.css"]
+        files: ["app/sass", "app/static/*.css", "app/templates/*"]
         tasks: ["compass"]
       html:
         files: ["src/**/*.html"]
