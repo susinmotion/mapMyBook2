@@ -8,7 +8,39 @@ from libraries import Library
 import cPickle as pickle
 import re
 
+import os
+import psycopg2
+import urlparse
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+conn = psycopg2.connect(
+    database="d6ki3e1ckkv6f3",
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
+
 cache={}
+ 
+"""
++class SqlBook(Base):
++       __tablename__="Books"
++       id = Column(Integer, primary_key=True)
++       title = Column(String(255), nullable=False)
++       author = Column(String(100), nullable =True)
++       link_to_copies = Column(String(100), nullable=True)
++
++class SqlCopy(Base):
++       __tablename__="Copies"
++       id = Column(Integer, primary_key=True)
++       location = Column(String(50), nullable=False)
++       call_number = Column(String(50), nullable=False)
++       status = Column(String(50), nullable=False)
++
++"""
 
 @app.route('/', methods=['GET'])
 
