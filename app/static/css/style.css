@@ -301,3 +301,7 @@ html {
   font-style: italic;
   color: rgba(255, 255, 255, 0.8);
 }
+/* line 43, ../../sass/style.sass */
+.container .results {
+  width: 100%;
+}
