@@ -1,7 +1,6 @@
 #!/newEnv/bin/python
 import os
 from flask import Flask
-from flask.ext.cache import Cache
 #NAME OF YOUR MODULE =...
 app = Flask(__name__, static_url_path='')
 #talk to config object...not sure about naming here.
