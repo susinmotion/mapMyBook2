@@ -1,4 +1,5 @@
 #!/newEnv/bin/python
+import os
 from flask import Flask
 from flask.ext.cache import Cache
 #NAME OF YOUR MODULE =...

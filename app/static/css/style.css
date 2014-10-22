@@ -1,0 +1,307 @@
+@import url(http://fonts.googleapis.com/css?family=Cardo);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+/* line 1, ../../sass/_easydoesit.scss */
+* {
+  box-sizing: border-box;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.container {
+  width: 100%;
+  max-width: 1170px;
+  padding: 0 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.row:after, .row:before {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+[class*=col-] {
+  float: left;
+  min-height: 1px;
+  padding: 12px;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.col-1 {
+  width: 16.66%;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.col-2 {
+  width: 33.32%;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.col-3 {
+  width: 49.98%;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.col-4 {
+  width: 66.64%;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.col-5 {
+  width: 83.3%;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.col-6 {
+  width: 99.96%;
+}
+
+@media all and (max-width: 800px) {
+  /* line 1, ../../sass/_easydoesit.scss */
+  .col-1 {
+    width: 33%;
+  }
+
+  /* line 1, ../../sass/_easydoesit.scss */
+  .col-2 {
+    width: 50%;
+  }
+
+  /* line 1, ../../sass/_easydoesit.scss */
+  .col-3 {
+    width: 83.33%;
+  }
+
+  /* line 1, ../../sass/_easydoesit.scss */
+  .col-4, .col-5, .col-6, .row .col-2:last-of-type, .row .col-5 ~ .col-1 {
+    width: 100%;
+  }
+}
+@media all and (max-width: 650px) {
+  /* line 1, ../../sass/_easydoesit.scss */
+  .col-1 {
+    width: 50%;
+  }
+
+  /* line 1, ../../sass/_easydoesit.scss */
+  .col-2, .col-3, .col-4, .col-5, .col-6 {
+    width: 100%;
+  }
+}
+/* line 1, ../../sass/_easydoesit.scss */
+[class*='-btn'] {
+  border-radius: 5px;
+  padding: 10px;
+  margin: 5px;
+  width: 120px;
+  font-size: 12px;
+  color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.orange-btn {
+  background-color: #ff8d1a;
+  -webkit-transition: .2s ease background-color;
+  -moz-transition: .2s ease background-color;
+  transition: .2s ease background-color;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.orange-btn:hover {
+  background-color: #cd6700;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.orange-btn:active {
+  top: 1px;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.red-btn {
+  background-color: #db6d5e;
+  -webkit-transition: .2s ease background-color;
+  -moz-transition: .2s ease background-color;
+  transition: .2s ease background-color;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.red-btn:hover {
+  background-color: #c13d2b;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.red-btn:active {
+  top: 1px;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.blue-btn {
+  background-color: #1c5e9e;
+  -webkit-transition: .2s ease background-color;
+  -moz-transition: .2s ease background-color;
+  transition: .2s ease background-color;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.blue-btn:hover {
+  background-color: #10375d;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.blue-btn:active {
+  top: 1px;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.green-btn {
+  background-color: #15b53f;
+  -webkit-transition: .2s ease background-color;
+  -moz-transition: .2s ease background-color;
+  transition: .2s ease background-color;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.green-btn:hover {
+  background-color: #0d7027;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.green-btn:active {
+  top: 1px;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.yellow-btn {
+  background-color: #ffe552;
+  -webkit-transition: .2s ease background-color;
+  -moz-transition: .2s ease background-color;
+  transition: .2s ease background-color;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.yellow-btn:hover {
+  background-color: #ffda05;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.yellow-btn:active {
+  top: 1px;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.white-btn {
+  -webkit-transition: .2s ease background-color;
+  -moz-transition: .2s ease background-color;
+  transition: .2s ease background-color;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.white-btn:active {
+  top: 1px;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.white-btn {
+  background-color: #fff;
+  color: #000;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+.white-btn:hover {
+  background-color: #f2f2f2;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+input, textarea {
+  margin: 5px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #d9d9d9;
+  font-size: 14px;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+input:focus, textarea:focus {
+  outline: 0;
+  box-shadow: 0 0 5px #b3b3b3;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+body.sans-serif {
+  font-family: "Open Sans",sans-serif;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+body.serif {
+  font-family: Cardo,serif;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+a {
+  color: #88c8f8;
+}
+
+/* line 1, ../../sass/_easydoesit.scss */
+a:hover {
+  color: #289bf2;
+}
+
+/* line 3, ../../sass/style.sass */
+html {
+  background: url(../nypl.jpg) no-repeat center center fixed;
+  background-size: cover;
+  height: 100%;
+}
+
+/* line 8, ../../sass/style.sass */
+.container {
+  background-color: rgba(0, 0, 0, 0.65);
+  border-radius: 5px;
+  color: white;
+  width: 50%;
+  position: absolute;
+  top: 20%;
+  left: 25%;
+}
+/* line 17, ../../sass/style.sass */
+.container .content {
+  text-align: center;
+}
+/* line 21, ../../sass/style.sass */
+.container h1 {
+  margin-top: 0px;
+}
+/* line 24, ../../sass/style.sass */
+.container input {
+  width: 75%;
+  margin: 10px;
+  font-family: Cardo, serif;
+}
+/* line 29, ../../sass/style.sass */
+.container input[type='checkbox'] {
+  width: 10px;
+}
+/* line 32, ../../sass/style.sass */
+.container label {
+  display: block;
+}
+/* line 35, ../../sass/style.sass */
+.container input[type='submit'] {
+  width: 25%;
+  font-size: 14px;
+}
+/* line 39, ../../sass/style.sass */
+.container .query {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.8);
+}
+/* line 43, ../../sass/style.sass */
+.container .results {
+  width: 100%;
+}

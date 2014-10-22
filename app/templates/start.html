@@ -1,12 +1,16 @@
-<html>
-<body>
-	Please input a title, author, or both
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Map My Book</h1>
+<p>Please input a title, author, or both</p>
 <form name="input" action="{{url_for('input', title=title, author=author)}}" method="GET">
-Title: <input type="text" name="title">
-Author: <input type="text" name="author"> 
-<br>
-<input type="checkbox" name="includeCheckedOut" value="yes">Include checked out copies<br>
-<input type="submit" value="Show me the books!">
-</form> 
-</body>
-</html>
+    <input type="text" name="title" placeholder="Title" autocomplete="off">
+    <input type="text" name="author" placeholder="Author" autocomplete="off"> 
+    <br>
+    <label>
+        <input type="checkbox" name="includeCheckedOut" value="yes">Include checked out copies
+    </label>
+    <input type="submit" value="Show me the books!" class='blue-btn'>
+</form>
+{% endblock %}
