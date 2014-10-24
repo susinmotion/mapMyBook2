@@ -3,16 +3,17 @@ from app import app
 from flask import render_template, url_for, request, redirect, jsonify
 import requests
 import googlemaps
-from NYPL import search, api
+
 from libraries import Library
 import cPickle as pickle
 import re
-
+from NYPL import search,api
 import os
 import psycopg2
 import urlparse
 import time
 from psycopg2 import extras
+import random
 
 #conn = psycopg2.connect(os.environ["DATABASE_URL"])
 
@@ -78,17 +79,10 @@ def map(bookID, title):
 		book=dict_cur.fetchone()
 		print book,"BOOK"
 	except Exception as e:
-		print "fail select by id %s" %e
-		print "nobook"
-		query = request.form.get("query").encode('ascii')
-		(throwaway, author)= query.split("_")
-		search(title, author)
-		#this is not done
+		return redirect(url_for('index'))
 
 	thebook = api.Book(title=book['title'], author=book['author'], link_to_copies=book["link_to_copies"])
-	print thebook.link_to_copies,"LINK"
-	print thebook.copies
-	new = False
+	makingNewCopies = False
 	try:
 		dict_cur.execute("""
 			SELECT c.*
@@ -104,16 +98,14 @@ def map(bookID, title):
 		for result in dict_cur.fetchall():
 			location = result['location']
 			collection = result['collection']
-			callno = result['callno']
+			callNo = result['callno']
 			status = result['status']
-			copy = Copy(name,collection, callno,status)
+			copy = api.Copy(name,collection, callNo,status)
 			copies.append(copy)
 
 	except Exception as e:
-		print e
 		copies = thebook.copies
-		print copies
-		new = True
+		makingNewCopies = True
 	
 
 	with open('dictionary.p', 'rb') as fp:
@@ -121,19 +113,29 @@ def map(bookID, title):
 	
 	libraries=[]
 	for copy in copies:
-		if new:
-				dict_cur.execute("INSERT INTO copies (id, location, collection, callno, status) VALUES (%f, %s,%s, %s,%s)" (copyid, copy.location,copy.collection, copy.callno,copy.status))
-				dict_cur.execute("INSERT INTO map (bookID, copyID) VALUES (%i, %s)" (bookid, copyid))
-
 		copy.location = re.sub(r"\(\d\)", "",copy.location).strip().replace("\'","")
+		thetime = 0
 		if copy.location in possible_libraries.keys():
 			possible_libraries[copy.location].name=possible_libraries[copy.location].name.strip()
 			possible_libraries[copy.location].address=possible_libraries[copy.location].address.strip()
 			possible_libraries[copy.location].number=possible_libraries[copy.location].number.strip()
 			possible_libraries[copy.location].status = copy.status
 			libraries.append(possible_libraries[copy.location])
-			copyid=time.mktime(time.localtime())
-			
+			thetime=time.mktime(time.localtime())
+
+		print libraries
+		if makingNewCopies:
+			try:
+				dict_cur.execute("INSERT INTO copies (time, location, collection, callno, status) VALUES (%s, %s,%s, %s,%s)", (thetime, copy.location,copy.collection, copy.callNo,copy.status))
+				dict_cur.execute("SELECT id FROM copies WHERE time = '{0}';".format(thetime))
+				copyid=dict_cur.fetchone()
+				print copyid[0],"copyid1"
+				print type(copyid),"copyidtype"
+				print str(copyid[0]),"strcopyid1"
+				dict_cur.execute("INSERT INTO books_copies (bookID, copyID) VALUES (%s, %s)", (bookID, copyid))
+			except Exception as e:
+				print e
+
 	includeCheckedOut = request.args.get("includeCheckedOut")
 	if includeCheckedOut != 'yes':
 		temp = []
@@ -142,8 +144,9 @@ def map(bookID, title):
 				temp.append(library)
 		libraries = temp
 
-	print libraries
-	print type(libraries[0])
+	if libraries == []:
+		return render_template ("nobooks_av.html", title=title, bookID=bookID, includeCheckedOut=includeCheckedOut)
+	
 	api_key=open('api_key').read()
 	url="https://maps.googleapis.com/maps/api/js?key=%s"%api_key
 	return render_template("libMap.html", libraries=libraries, url=url, title=title, includeCheckedOut= includeCheckedOut)
@@ -160,7 +163,6 @@ def checkedOut(title):
 @app.route('/noBooks/<title>')
 def noBooks(title):
 	return render_template("nobooks.html", title=title)
-
 
 #these include the data itself that could be part of the view. The html page controls how it looks and what gets shown
 #def THE NAME OF THE THING AFTER THE SLASH--different page views
