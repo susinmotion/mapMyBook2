@@ -33,37 +33,30 @@ conn = psycopg2.connect(
 )
 conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-@app.route('/', methods=['GET'])
 
+@app.route('/', methods=['GET'])
 def index():
 	return render_template ("start.html")
 
 @app.route('/input', methods=['GET'])
 #@app.route('/input/<title>', methods =['GET'])
 def input(title=None, author = None):
-	returnbooks=[]
 	title=request.args.get('title')
 	author=request.args.get("author")
 	includeCheckedOut=request.args.get("includeCheckedOut")
 	query= title.upper()+"_"+author.upper()
-	try:
-		dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
-		returnbooks=dict_cur.fetchall()
-	except Exception as e:
-		print e
+	
+	dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
+	returnbooks=dict_cur.fetchall()
 
 	if returnbooks == []:
 		books=search(title=title, author=author)
 		index= 0
-		for book in books[0:min(5, len(books))]:
+		for book in books[0:min(6, len(books))]:
 			if book.link_to_copies:
 				index = index +1
 				libHash = book.link_to_copies[53:book.link_to_copies.find("?")]
-				try:
 					dict_cur.execute("INSERT INTO books (index,query,title, author, link_to_copies, libHash) VALUES (%s,%s, %s,%s, %s, %s)",(index, query, book.title, book.author, book.link_to_copies, libHash))
-				except Exception as e:
-					print "Fail! %s %s %s %s %s %s" %(libHash, index, query, book.title, book.author, e)
-
 					index = index - 1
 
 		dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
@@ -71,46 +64,44 @@ def input(title=None, author = None):
 
 
 	if returnbooks == []:
-		return render_template("noBooks.html", title=title, author=author)
+		return redirect(url_for("noBooks", title=title, author=author))
 	else:
 		return render_template("pickabook.html",books=returnbooks, query=query, includeCheckedOut = includeCheckedOut )
 
 @app.route('/map')
-#@app.route('/map/<libHash>', methods=['GET'])
 @app.route('/map/<libHash>/<title>', methods=['GET','POST'])
-#@app.route('/map/,libHash>/<title>/<includeCheckedOut>')
+
 def map(libHash, title):
-	#libHash= request.args["libHash"]
-	#print libHash
 	dict_cur.execute("SELECT * FROM books WHERE libHash = '{0}';".format(libHash) )
 	book=dict_cur.fetchone()
 	if book == None:
 		return redirect(url_for('index'))
 
 	thebook = api.Book(title=book['title'], author=book['author'], link_to_copies=book["link_to_copies"])
-	makingNewCopies = False
-	try:
-		dict_cur.execute("""
-			SELECT c.*
-			FROM 
-						copies  c
-			INNER JOIN books 	b
-				ON b.libHash = c.libHash
-			WHERE b.libHash = '{0}'
-		""".format(libHash))
-		copies = []
-		for result in dict_cur.fetchall():
-			location = result['location']
-			collection = result['collection']
-			callNo = result['callno']
-			status = result['status']
-			copy = api.Copy(location,collection, callNo,status)
-			copies.append(copy)
-	except Exception as e:
-		print e
+	noCopiesInDatabase = True
+
+	dict_cur.execute("""
+		SELECT c.*
+		FROM 
+					copies  c
+		INNER JOIN books 	b
+			ON b.libHash = c.libHash
+		WHERE b.libHash = '{0}'
+	""".format(libHash))
+
+	copies = []
+	for result in dict_cur.fetchall():
+		location = result['location']
+		collection = result['collection']
+		callNo = result['callno']
+		status = result['status']
+		copy = api.Copy(location, collection, callNo, status)
+		copies.append(copy)
+
 	if copies ==[]:
+		foundCopiesInDatabase = False
 		copies = thebook.copies
-		makingNewCopies = True
+		
 	
 	with open('dictionary.p', 'rb') as fp:
 		possible_libraries = pickle.load(fp)
@@ -127,7 +118,7 @@ def map(libHash, title):
 			libraries.append(possible_libraries[copy.location])
 			del possible_libraries[copy.location]
 			thetime=time.mktime(time.localtime())
-		if makingNewCopies:
+		if foundCopiesInDatabase == False:
 			try:
 				dict_cur.execute("INSERT INTO copies (time, location, collection, callno, status, libHash) VALUES (%s, %s,%s, %s,%s, %s)", (thetime, copy.location,copy.collection, copy.callNo,copy.status, libHash))
 				dict_cur.execute("SELECT id FROM copies WHERE time = '{0}';".format(thetime))
@@ -144,6 +135,8 @@ def map(libHash, title):
 			if library.status == "Available":
 				temp.append(library)
 		libraries = temp	
+
+		
 	if libraries == []:
 		return render_template ("nobooks_av.html", title=title, libHash=libHash, includeCheckedOut=includeCheckedOut)
 	
@@ -152,17 +145,10 @@ def map(libHash, title):
 	return render_template("libMap.html", libraries=libraries, url=url, title=title, includeCheckedOut= includeCheckedOut)
 
 @app.route('/didyoumean/<alt>')
-
 def alt(alt):
 	return render_template ("didyoumean.html",alt=alt)
 
-@app.route('/checkedOut/<title>')
-def checkedOut(title):
-	return render_template("noneFound.html", title=title)
 
-@app.route('/noBooks/<title>')
-def noBooks(title):
-	return render_template("nobooks.html", title=title)
-
-#these include the data itself that could be part of the view. The html page controls how it looks and what gets shown
-#def THE NAME OF THE THING AFTER THE SLASH--different page views
+@app.route('/noBooks/<title>/<author>')
+def noBooks(title, author):
+	return render_template("nobooks.html", title=title, author=author)
