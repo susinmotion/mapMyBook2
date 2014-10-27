@@ -15,6 +15,10 @@ import time
 from psycopg2 import extras
 import random
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 #conn = psycopg2.connect(os.environ["DATABASE_URL"])
 
 urlparse.uses_netloc.append("postgres")
@@ -53,17 +57,18 @@ def input(title=None, author = None):
 		index= 0
 		for book in books[0:min(5, len(books))]:
 			if book.link_to_copies:
-				print book.link_to_copies
 				index = index +1
-				bookID = book.link_to_copies[53:book.link_to_copies.find("?")]
+				libHash = book.link_to_copies[53:book.link_to_copies.find("?")]
 				try:
-					dict_cur.execute("INSERT INTO books (id, index,query,title, author, link_to_copies) VALUES (%s,%s,%s, %s,%s, %s)",(bookID, index, query, book.title, book.author, book.link_to_copies))
+					dict_cur.execute("INSERT INTO books (index,query,title, author, link_to_copies, libHash) VALUES (%s,%s, %s,%s, %s, %s)",(index, query, book.title, book.author, book.link_to_copies, libHash))
 				except Exception as e:
-					#print "Fail! %s %s %s %s %s %s" %(bookID, index, query, book.title, book.author, e)
+					print "Fail! %s %s %s %s %s %s" %(libHash, index, query, book.title, book.author, e)
+
 					index = index - 1
 
 		dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
 		returnbooks = dict_cur.fetchall()
+		print returnbooks
 
 
 	if returnbooks == []:
@@ -72,28 +77,29 @@ def input(title=None, author = None):
 		return render_template("pickabook.html",books=returnbooks, query=query, includeCheckedOut = includeCheckedOut )
 
 @app.route('/map')
-@app.route('/map/<bookID>/<title>', methods=['GET','POST'])
-def map(bookID, title):
-	try:
-		dict_cur.execute("SELECT * FROM books WHERE id = '{0}';".format(bookID) )
-		book=dict_cur.fetchone()
-		print book,"BOOK"
-	except Exception as e:
+#@app.route('/map/<libHash>', methods=['GET'])
+@app.route('/map/<libHash>/<title>', methods=['GET','POST'])
+#@app.route('/map/,libHash>/<title>/<includeCheckedOut>')
+def map(libHash, title):
+	#libHash= request.args["libHash"]
+	#print libHash
+	dict_cur.execute("SELECT * FROM books WHERE libHash = '{0}';".format(libHash) )
+	book=dict_cur.fetchone()
+	if book == None:
 		return redirect(url_for('index'))
 
 	thebook = api.Book(title=book['title'], author=book['author'], link_to_copies=book["link_to_copies"])
+	print thebook
 	makingNewCopies = False
 	try:
 		dict_cur.execute("""
 			SELECT c.*
 			FROM 
 						copies  c
-			INNER JOIN	books_copies 	bc
-				ON c.id = bc.copyid
 			INNER JOIN books 	b
-				ON b.id = bc.bookID
-			WHERE b.id = '{0}')
-		""".format(bookID))
+				ON b.libHash = c.libHash
+			WHERE b.libHash = '{0}')
+		""".format(libHash))
 		copies = []
 		for result in dict_cur.fetchall():
 			location = result['location']
@@ -102,12 +108,14 @@ def map(bookID, title):
 			status = result['status']
 			copy = api.Copy(name,collection, callNo,status)
 			copies.append(copy)
-
+			print copies
+			print "in the database"
 	except Exception as e:
+		print "not in the database"
 		copies = thebook.copies
 		makingNewCopies = True
 	
-
+	print len(copies),"lenght of copies"
 	with open('dictionary.p', 'rb') as fp:
 		possible_libraries = pickle.load(fp)
 	
@@ -123,16 +131,15 @@ def map(bookID, title):
 			libraries.append(possible_libraries[copy.location])
 			thetime=time.mktime(time.localtime())
 
-		print libraries
 		if makingNewCopies:
 			try:
-				dict_cur.execute("INSERT INTO copies (time, location, collection, callno, status) VALUES (%s, %s,%s, %s,%s)", (thetime, copy.location,copy.collection, copy.callNo,copy.status))
+				dict_cur.execute("INSERT INTO copies (time, location, collection, callno, status, libHash) VALUES (%s, %s,%s, %s,%s, %s)", (thetime, copy.location,copy.collection, copy.callNo,copy.status, libHash))
 				dict_cur.execute("SELECT id FROM copies WHERE time = '{0}';".format(thetime))
 				copyid=dict_cur.fetchone()
 				print copyid[0],"copyid1"
 				print type(copyid),"copyidtype"
 				print str(copyid[0]),"strcopyid1"
-				dict_cur.execute("INSERT INTO books_copies (bookID, copyID) VALUES (%s, %s)", (bookID, copyid))
+				#dict_cur.execute("INSERT INTO books_copies (bookID, copyID) VALUES (%s, %s)", (bookID, copyid))
 			except Exception as e:
 				print e
 
@@ -143,9 +150,10 @@ def map(bookID, title):
 			if library.status == "Available":
 				temp.append(library)
 		libraries = temp
-
+	print libraries
+	print len(libraries),"lenght of libraries"
 	if libraries == []:
-		return render_template ("nobooks_av.html", title=title, bookID=bookID, includeCheckedOut=includeCheckedOut)
+		return render_template ("nobooks_av.html", title=title, libHash=libHash, includeCheckedOut=includeCheckedOut)
 	
 	api_key=open('api_key').read()
 	url="https://maps.googleapis.com/maps/api/js?key=%s"%api_key

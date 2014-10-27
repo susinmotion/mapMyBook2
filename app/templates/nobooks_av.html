@@ -7,7 +7,7 @@
     	but everything's checked out :( </p>
   			<br>
 
-  	<p>Do you want to see the checked out copies?</p><a href = "{{url_for('map', bookID=bookID, title=title, includeCheckedOut='yes')}}"> Click here for the map of all the checked out things!</a>
+  	<p>Do you want to see the checked out copies?</p><a href = "{{url_for('map', libHash=libHash, title=title, includeCheckedOut='yes')}}"> Click here for the map of all the checked out things!</a>
   	<br>
 
   	{% else %}

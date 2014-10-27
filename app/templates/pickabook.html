@@ -3,8 +3,8 @@
 
 {% block content %}
     {% for book in books %}
-        <form name="{{books.index(book)}}" action="{{url_for('map', bookID =book['id'],title=book['title'])}}" method="GET">
-        <button type="submit" class="blue-btn results">{{book['title']}}
+        <form name="{{books.index(book)}}" action="{{url_for('map', libHash =book['libhash'],title=book['title'])}}" method="GET">
+        <button type="submit" class="blue-btn results">{{book['title']}}  {{book['author']}}
         </button>
         <input type="hidden" name="includeCheckedOut" value="{{includeCheckedOut}}">
         </form> 
