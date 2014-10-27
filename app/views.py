@@ -45,7 +45,7 @@ def input(title=None, author = None):
 	title=request.args.get('title')
 	author=request.args.get("author")
 	includeCheckedOut=request.args.get("includeCheckedOut")
-	query= title+"_"+author
+	query= title.upper()+"_"+author.upper()
 	try:
 		dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
 		returnbooks=dict_cur.fetchall()
@@ -68,7 +68,6 @@ def input(title=None, author = None):
 
 		dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
 		returnbooks = dict_cur.fetchall()
-		print returnbooks
 
 
 	if returnbooks == []:
@@ -89,7 +88,6 @@ def map(libHash, title):
 		return redirect(url_for('index'))
 
 	thebook = api.Book(title=book['title'], author=book['author'], link_to_copies=book["link_to_copies"])
-	print thebook
 	makingNewCopies = False
 	try:
 		dict_cur.execute("""
@@ -98,7 +96,7 @@ def map(libHash, title):
 						copies  c
 			INNER JOIN books 	b
 				ON b.libHash = c.libHash
-			WHERE b.libHash = '{0}')
+			WHERE b.libHash = '{0}'
 		""".format(libHash))
 		copies = []
 		for result in dict_cur.fetchall():
@@ -106,16 +104,14 @@ def map(libHash, title):
 			collection = result['collection']
 			callNo = result['callno']
 			status = result['status']
-			copy = api.Copy(name,collection, callNo,status)
+			copy = api.Copy(location,collection, callNo,status)
 			copies.append(copy)
-			print copies
-			print "in the database"
 	except Exception as e:
-		print "not in the database"
+		print e
+	if copies ==[]:
 		copies = thebook.copies
 		makingNewCopies = True
 	
-	print len(copies),"lenght of copies"
 	with open('dictionary.p', 'rb') as fp:
 		possible_libraries = pickle.load(fp)
 	
@@ -129,29 +125,25 @@ def map(libHash, title):
 			possible_libraries[copy.location].number=possible_libraries[copy.location].number.strip()
 			possible_libraries[copy.location].status = copy.status
 			libraries.append(possible_libraries[copy.location])
+			del possible_libraries[copy.location]
 			thetime=time.mktime(time.localtime())
-
 		if makingNewCopies:
 			try:
 				dict_cur.execute("INSERT INTO copies (time, location, collection, callno, status, libHash) VALUES (%s, %s,%s, %s,%s, %s)", (thetime, copy.location,copy.collection, copy.callNo,copy.status, libHash))
 				dict_cur.execute("SELECT id FROM copies WHERE time = '{0}';".format(thetime))
 				copyid=dict_cur.fetchone()
-				print copyid[0],"copyid1"
-				print type(copyid),"copyidtype"
-				print str(copyid[0]),"strcopyid1"
-				#dict_cur.execute("INSERT INTO books_copies (bookID, copyID) VALUES (%s, %s)", (bookID, copyid))
+				dict_cur.execute("SELECT id FROM books WHERE libHash ='{0}';".format(libHash))
+				bookID = dict_cur.fetchone()
+				dict_cur.execute("INSERT INTO books_copies (bookID, copyID) VALUES (%s, %s)", (bookID, copyid))
 			except Exception as e:
 				print e
-
 	includeCheckedOut = request.args.get("includeCheckedOut")
 	if includeCheckedOut != 'yes':
 		temp = []
 		for library in libraries:
 			if library.status == "Available":
 				temp.append(library)
-		libraries = temp
-	print libraries
-	print len(libraries),"lenght of libraries"
+		libraries = temp	
 	if libraries == []:
 		return render_template ("nobooks_av.html", title=title, libHash=libHash, includeCheckedOut=includeCheckedOut)
 	
