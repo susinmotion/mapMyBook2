@@ -16,11 +16,13 @@ from psycopg2 import extras
 import random
 
 import sys
+import datetime
+
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-#conn = psycopg2.connect(os.environ["DATABASE_URL"])
-
+#connect to psql database
 urlparse.uses_netloc.append("postgres")
 url = urlparse.urlparse("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec2-174-129-21-42.compute-1.amazonaws.com:5432/d6ki3e1ckkv6f3")
 
@@ -39,16 +41,17 @@ def index():
 	return render_template ("start.html")
 
 @app.route('/input', methods=['GET'])
-#@app.route('/input/<title>', methods =['GET'])
 def input(title=None, author = None):
 	title=request.args.get('title')
 	author=request.args.get("author")
 	includeCheckedOut=request.args.get("includeCheckedOut")
 	query= title.upper()+"_"+author.upper()
 	
+	#query the database with user query
 	dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
 	returnbooks=dict_cur.fetchall()
 
+	#if no match found, query the site instead
 	if returnbooks == []:
 		books=search(title=title, author=author)
 		index= 0
@@ -56,13 +59,14 @@ def input(title=None, author = None):
 			if book.link_to_copies:
 				index = index +1
 				libHash = book.link_to_copies[53:book.link_to_copies.find("?")]
-					dict_cur.execute("INSERT INTO books (index,query,title, author, link_to_copies, libHash) VALUES (%s,%s, %s,%s, %s, %s)",(index, query, book.title, book.author, book.link_to_copies, libHash))
-					index = index - 1
-
+				#add results from site to the database
+				dict_cur.execute("INSERT INTO books (index,query,title, author, link_to_copies, libHash) VALUES (%s,%s, %s,%s, %s, %s)",(index, query, book.title, book.author, book.link_to_copies, libHash))
+				index = index - 1
+		#query the database with user query again
 		dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
 		returnbooks = dict_cur.fetchall()
 
-
+	#if still no results, show error page
 	if returnbooks == []:
 		return redirect(url_for("noBooks", title=title, author=author))
 	else:
@@ -74,12 +78,18 @@ def input(title=None, author = None):
 def map(libHash, title):
 	dict_cur.execute("SELECT * FROM books WHERE libHash = '{0}';".format(libHash) )
 	book=dict_cur.fetchone()
+
 	if book == None:
 		return redirect(url_for('index'))
 
 	thebook = api.Book(title=book['title'], author=book['author'], link_to_copies=book["link_to_copies"])
-	noCopiesInDatabase = True
+	foundCopiesInDatabase = True
 
+	today=datetime.datetime.now().date()
+	yesterday=today-datetime.timedelta(1)
+	#get rid of all copy objects that are from before yesterday
+	dict_cur.execute("DELETE FROM copies WHERE thedate <= '{}';".format(yesterday))
+	#query database for copies of the book the user selected
 	dict_cur.execute("""
 		SELECT c.*
 		FROM 
@@ -95,54 +105,61 @@ def map(libHash, title):
 		collection = result['collection']
 		callNo = result['callno']
 		status = result['status']
+
 		copy = api.Copy(location, collection, callNo, status)
+
 		copies.append(copy)
 
+	#if none found, query the site for copies of book
 	if copies ==[]:
 		foundCopiesInDatabase = False
 		copies = thebook.copies
 		
-	
+	#load dictionary of library names and info
 	with open('dictionary.p', 'rb') as fp:
 		possible_libraries = pickle.load(fp)
 	
-	libraries=[]
+	#match each copy to the info of the library that has it, and add this to the librariesWbook list
+	librariesWBook=[]
 	for copy in copies:
 		copy.location = re.sub(r"\(\d\)", "",copy.location).strip().replace("\'","")
-		thetime = 0
-		if copy.location in possible_libraries.keys():
-			possible_libraries[copy.location].name=possible_libraries[copy.location].name.strip()
-			possible_libraries[copy.location].address=possible_libraries[copy.location].address.strip()
-			possible_libraries[copy.location].number=possible_libraries[copy.location].number.strip()
+		thetime = 0			
+		try:
 			possible_libraries[copy.location].status = copy.status
-			libraries.append(possible_libraries[copy.location])
+			librariesWBook.append(possible_libraries[copy.location])
 			del possible_libraries[copy.location]
-			thetime=time.mktime(time.localtime())
+		except Exception:
+			print copy.location
+			
+
+
+		
+		#if copies were retrieved from site not database, add them to the database
 		if foundCopiesInDatabase == False:
-			try:
-				dict_cur.execute("INSERT INTO copies (time, location, collection, callno, status, libHash) VALUES (%s, %s,%s, %s,%s, %s)", (thetime, copy.location,copy.collection, copy.callNo,copy.status, libHash))
-				dict_cur.execute("SELECT id FROM copies WHERE time = '{0}';".format(thetime))
-				copyid=dict_cur.fetchone()
-				dict_cur.execute("SELECT id FROM books WHERE libHash ='{0}';".format(libHash))
-				bookID = dict_cur.fetchone()
-				dict_cur.execute("INSERT INTO books_copies (bookID, copyID) VALUES (%s, %s)", (bookID, copyid))
-			except Exception as e:
-				print e
+			dict_cur.execute("INSERT INTO copies (thedate, location, collection, callno, status, libHash) VALUES (%s, %s,%s, %s,%s, %s)", (today, copy.location,copy.collection, copy.callNo,copy.status, libHash))
+			dict_cur.execute("SELECT id FROM copies WHERE thedate = '{0}';".format(today))
+			copyid=dict_cur.fetchone()
+			dict_cur.execute("SELECT id FROM books WHERE libHash ='{0}';".format(libHash))
+			bookID = dict_cur.fetchone()
+			
+			dict_cur.execute("INSERT INTO books_copies (bookID, copyID) VALUES (%s, %s)", (bookID, copyid))
+
+	#if the user selected checked out, filter results by status available
 	includeCheckedOut = request.args.get("includeCheckedOut")
 	if includeCheckedOut != 'yes':
 		temp = []
-		for library in libraries:
+		for library in librariesWBook:
 			if library.status == "Available":
 				temp.append(library)
-		libraries = temp	
+		librariesWBook = temp	
 
-		
-	if libraries == []:
+	#if no results, return error page
+	if librariesWBook == []:
 		return render_template ("nobooks_av.html", title=title, libHash=libHash, includeCheckedOut=includeCheckedOut)
 	
 	api_key=open('api_key').read()
 	url="https://maps.googleapis.com/maps/api/js?key=%s"%api_key
-	return render_template("libMap.html", libraries=libraries, url=url, title=title, includeCheckedOut= includeCheckedOut)
+	return render_template("libMap.html", libraries=librariesWBook, url=url, title=title, includeCheckedOut= includeCheckedOut)
 
 @app.route('/didyoumean/<alt>')
 def alt(alt):
