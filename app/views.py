@@ -166,6 +166,6 @@ def alt(alt):
 	return render_template ("didyoumean.html",alt=alt)
 
 
-@app.route('/noBooks/<title>/<author>')
-def noBooks(title, author):
+@app.route('/noBooks/')
+def noBooks(title=None, author=None):
 	return render_template("nobooks.html", title=title, author=author)
