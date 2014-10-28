@@ -68,7 +68,13 @@ def input(title=None, author = None):
 
 	#if still no results, show error page
 	if returnbooks == []:
-		return redirect(url_for("noBooks", title=title, author=author))
+		chunk=api.get_source(api.create_search_url(title=title, author=author)).findAll(testid="link_didyoumean")
+		print chunk
+		if chunk:
+			alt = str(chunk[0].text).split[0]
+		else:
+			alt = None
+		return redirect(url_for("noBooks", title=title, author=author, alt=alt))
 	else:
 		return render_template("pickabook.html",books=returnbooks, query=query, includeCheckedOut = includeCheckedOut )
 
@@ -168,4 +174,6 @@ def alt(alt):
 
 @app.route('/noBooks/')
 def noBooks(title=None, author=None):
+	title = request.args.get("title")
+	author=request.args.get("author")
 	return render_template("nobooks.html", title=title, author=author)

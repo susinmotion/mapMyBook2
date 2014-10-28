@@ -3,5 +3,18 @@
 
 {% block content %}
     <h2>Nothing found</h2>
-    <p>You searched for <span class='query'>{{title}} {{author}}</span> but we didn't find anything :( Do you want to search again?</p><a href="{{url_for('index')}}">Click here to find some books</a> 
+    <p>You searched for <span class='query'>
+    	{% if title != None %}
+    	{{title}} 
+    	{% endif %}
+    	{% if author != None %}
+    	{{author}}
+    	{% endif %}
+    	</span> but we didn't find anything :( 
+
+    	{% if alt  %}
+    	Did you mean </p><a href="{{url_for ('input', title=title, author=author)}}">{{alt}}?</a>
+    	<br>
+    	{% endif %}
+    	Do you want to search again?</p><a href="{{url_for('index')}}">Click here to find some books</a> 
 {% endblock %}
