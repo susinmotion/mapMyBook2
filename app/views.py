@@ -5,11 +5,9 @@ import requests
 import googlemaps
 
 from libraries import Library
-from api2 import search
-from api2 import create_search_url 
 import cPickle as pickle
 import re
-from NYPL import api
+from NYPL import api, search
 import os
 import psycopg2
 import urlparse
@@ -73,7 +71,7 @@ def input(title=None, author = None):
 	#if still no results, show error page
 	if returnbooks == []:
 		try:
-			alt=re.sub(r'\([^)]*\)', '', api.get_source(create_search_url(title=title, author=author)).find(testid="link_didyoumean").text).strip()
+			alt=re.sub(r'\([^)]*\)', '', api.get_source(api.create_search_url(title=title, author=author)).find(testid="link_didyoumean").text).strip()
 			print alt
 		except Exception as e:
 			print e

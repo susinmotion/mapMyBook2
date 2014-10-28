@@ -1,6 +1,6 @@
 --index-url https://pypi.python.org/simple/
 
-NYPL >=0.1.11
+NYPL >=0.1.12
 requests>1.2.0
 beautifulsoup4>=4.0.0
 googlemaps >=1.0.1
