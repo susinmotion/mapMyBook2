@@ -5,9 +5,11 @@ import requests
 import googlemaps
 
 from libraries import Library
+from api2 import search
+from api2 import create_search_url 
 import cPickle as pickle
 import re
-from NYPL import search,api
+from NYPL import api
 import os
 import psycopg2
 import urlparse
@@ -42,8 +44,10 @@ def index():
 
 @app.route('/input', methods=['GET'])
 def input(title=None, author = None):
-	title=request.args.get('title')
+	title=request.args.get("title")
 	author=request.args.get("author")
+	if not author:
+		author = ""
 	includeCheckedOut=request.args.get("includeCheckedOut")
 	query= title.upper()+"_"+author.upper()
 	
@@ -68,12 +72,13 @@ def input(title=None, author = None):
 
 	#if still no results, show error page
 	if returnbooks == []:
-		chunk=api.get_source(api.create_search_url(title=title, author=author)).findAll(testid="link_didyoumean")
-		print chunk
-		if chunk:
-			alt = str(chunk[0].text).split[0]
-		else:
+		try:
+			alt=re.sub(r'\([^)]*\)', '', api.get_source(create_search_url(title=title, author=author)).find(testid="link_didyoumean").text).strip()
+			print alt
+		except Exception as e:
+			print e
 			alt = None
+		print alt
 		return redirect(url_for("noBooks", title=title, author=author, alt=alt))
 	else:
 		return render_template("pickabook.html",books=returnbooks, query=query, includeCheckedOut = includeCheckedOut )
@@ -173,7 +178,8 @@ def alt(alt):
 
 
 @app.route('/noBooks/')
-def noBooks(title=None, author=None):
+def noBooks(title=None, author=None, alt=None):
 	title = request.args.get("title")
 	author=request.args.get("author")
-	return render_template("nobooks.html", title=title, author=author)
+	alt= request.args.get("alt")
+	return render_template("nobooks.html", title=title, author=author, alt=alt)

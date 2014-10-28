@@ -10,11 +10,10 @@
     	{% if author != None %}
     	{{author}}
     	{% endif %}
-    	</span> but we didn't find anything :( 
-
-    	{% if alt  %}
-    	Did you mean </p><a href="{{url_for ('input', title=title, author=author)}}">{{alt}}?</a>
-    	<br>
+    	</span> but we didn't find anything :( </p>
+    	{% if alt !=None %}
+    	Did you mean <p><a href="{{url_for ('input', title=alt)}}">{{alt}}?</a>
+    	</p><br>Or, 
     	{% endif %}
-    	Do you want to search again?</p><a href="{{url_for('index')}}">Click here to find some books</a> 
+    	Do you want to search again?<p><a href="{{url_for('index')}}">Click here to find some books</a> </p>
 {% endblock %}
