@@ -47,8 +47,7 @@ def input(title=None, author = None):
 	if not author:
 		author = ""
 	includeCheckedOut=request.args.get("includeCheckedOut")
-	query= title.upper()+"_"+author.upper()
-	
+	query= title.replace('\'',"").upper()+"_"+author.upper()
 	#query the database with user query
 	dict_cur.execute("SELECT * FROM books WHERE query = '{0}';".format( query ))
 	returnbooks=dict_cur.fetchall()
