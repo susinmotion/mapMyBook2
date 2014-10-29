@@ -29,7 +29,7 @@
           '<div id="siteNotice">'+
           '</div>'+
           '<h1 id="firstHeading" class="firstHeading">{{library.name}}</h1>'+
-          '<p>{{library.address}}</p>'+'<p>{{library.number}}</p>';
+          '<p>{{library.address}}</p>'+'<p>{{library.number}}</p>'+'<p><a href="https://www.google.com/maps/dir//{{library.latLng[0]}},{{library.latLng[1]}}/@{{library.latLng[0]}},{{library.latLng[1]}},17z/data=!3m1!4b1?hl=en">Get directions</a></p>';
           {% if includeCheckedOut == 'yes'%}
           contentString= contentString+'<p>{{library.status}}</p>'
           {% endif %}
